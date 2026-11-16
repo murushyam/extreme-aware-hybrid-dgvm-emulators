@@ -1,0 +1,10 @@
+# Example configuration for hybrid emulator
+model:
+  patch_size: 18
+  latent_asrz: true
+training:
+  years: [2000, 2021]
+  extreme_weight: 2.0
+data:
+  use_fwi: true
+  use_burned_area: true
