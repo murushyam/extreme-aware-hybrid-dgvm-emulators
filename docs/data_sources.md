@@ -1,12 +1,34 @@
-# Data Sources
+# Data sources
 
-All datasets are publicly available.
+All datasets listed below are publicly distributed by their official providers. Local copies belong under `data/` (gitignored). Resolution, period and access notes are taken from the provider pages cited here. Where a detail could not be confirmed during link checks, the table says to see the provider.
 
-- **TRENDY NBP**: Global Carbon Budget / TRENDY project portals (S2/S3 simulations)
-- **ERA5 Climate & FWI**: Copernicus Climate Data Store (CDS), GEFF products, Zenodo reanalyses (e.g., McElhinny et al.)
-- **Burned Area**: MODIS MCD64A1 (LP DAAC / Google Earth Engine); 0.25° aggregates on Zenodo
-- **Fire Emissions**: GFED5 and GFED5NRT (globalfiredata.org / Zenodo)
-- **Drought Indices**: ERA5-derived VPD, SPEI
-- **ENSO**: Standard climate indices
+| Dataset | Variable | Spatial / temporal resolution | Period | Official access | Notes |
+| --- | --- | --- | --- | --- | --- |
+| TRENDY S2/S3 (Global Carbon Project) | Net biome production (NBP); other land-model output as documented for each release | Model-dependent; many emulator studies remap to 0.5° monthly. See the release documentation. | Historical simulations updated with each Global Carbon Budget cycle. See provider. | [Global Carbon Budget Data Browser](https://mdosullivan.github.io/GCB/) | Official browser for TRENDY land-model output and forcing used in the Global Carbon Budget. A CDS or other login is not used here, but the TRENDY / GCB data policy applies and may require discussion with coordinators for some uses. S2 typically varies climate and CO2 (land use held at a pre-industrial or early map). S3 also varies land use. Confirm the protocol in the documentation for the release you download. |
+| ERA5 | Near-surface climate used as emulator forcing (2 m temperature, 2 m dewpoint, precipitation, radiation, wind, and related fields) | CDS interpolated grid: 0.25°. Hourly and monthly means are both available. | 1940 to present | [ERA5 single levels](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) and [ERA5 monthly averaged single levels](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means) | Copernicus Climate Data Store (CDS). A CDS account is required. Prefer monthly means for a monthly emulator, or aggregate hourly fields if a custom monthly statistic is needed. |
+| ERA5-based Fire Weather Index (CEMS) | Fire Weather Index (FWI) and related fire-danger indices | Reanalysis fields on a 0.25° regular grid, daily | 1940 to present | [CEMS fire danger indices historical data](https://ewds.climate.copernicus.eu/datasets/cems-fire-historical-v1) | Copernicus Emergency Management Service indices forced by ERA5, hosted on the Copernicus Energy and Water (EWDS) / CDS family of stores. An ECMWF / Copernicus account is required. Ensemble members are provided at coarser resolution; see the dataset page. |
+| MODIS MCD64A1 | Burned area (burn date, uncertainty and quality layers) | 500 m, monthly, global SIN grid | November 2000 to present (Collection 6.1 / Version 061) | [LP DAAC / NASA Earthdata product page](https://www.earthdata.nasa.gov/data/catalog/lpcloud-mcd64a1-061) | Land Processes DAAC product. An Earthdata login is required. The LP DAAC short name URL redirects to this catalogue entry. Browse metadata is also on [LAADS](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MCD64A1/). |
+| GFED5 / GFED5.1 | Burned area and fire emissions | 0.25° gridded NetCDF from 2001 onward. The 1997-2000 segment may differ; see the provider README. | GFED5.1: 1997-2022 | [Global Fire Emissions Database data page](https://www.globalfiredata.org/data.html) | Gridded files are distributed by SFTP. Login details and the port (1022) are given on the GFED data page. Do not commit credentials. A burned-area DOI associated with the GFED5 ESSD paper is https://doi.org/10.5281/zenodo.7668423; the Zenodo landing page blocked automated HTTP checks, so treat the DOI as a bibliographic pointer and use the GFED page for downloads. |
+| GFED5.1NRT | Near-real-time burned area and emissions | See provider | 2023 onward | [Same GFED data page](https://www.globalfiredata.org/data.html) | Distributed alongside GFED5.1, in separate reprocessed and update directories. This is the product intended for low-latency updates after the end of the GFED5.1 record. |
+| VPD (derived) | Vapour pressure deficit | Follows the ERA5 grid and time step used as input | Follows ERA5 | Derived from the ERA5 datasets linked above | Compute from ERA5 2 m temperature and 2 m dewpoint (standard Magnus or equivalent formulae). There is no separate official VPD product required for this project. |
+| SPEI (SPEIbase) | Standardized Precipitation-Evapotranspiration Index, timescales 1 to 48 months | 0.5°, monthly | SPEIbase v2.11: January 1901 to December 2024 | [Global SPEI database](https://spei.csic.es/database.html) | Official SPEIbase page. v2.11 uses CRU TS 4.09 and FAO-56 Penman-Monteith potential evapotranspiration. A version-specific download path advertised on that page (`/spei_database_2_11`) did not respond during automated checks; start from the database page itself. |
+| ENSO (ONI / Niño 3.4) | Oceanic Niño Index; Niño 3.4 sea-surface temperature anomaly | Climate index (not a spatial grid), monthly or three-month running mean | See the CPC / PSL records (ONI is published as a three-month running mean of ERSSTv5 anomalies in the Niño 3.4 region) | [CPC ONI (ERSSTv5)](https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php), [CPC ONI v5 directory](https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/oni/v5/), [CPC monthly index values](https://www.cpc.ncep.noaa.gov/data/indices/), and [PSL Niño 3.4](https://psl.noaa.gov/data/timeseries/monthly/NINO34/) | NOAA Climate Prediction Center and Physical Sciences Laboratory. Use one consistent index (ONI or Niño 3.4) throughout an experiment and record the choice in the configuration file. |
 
-These cover the 2000–2024 period for training and evaluation.
+## Link checks (16 November 2026, Asia/Calcutta)
+
+HTTP 200 with a working landing page: Global Carbon Budget Data Browser; both ERA5 CDS dataset pages; CEMS fire-danger EWDS page; NASA Earthdata MCD64A1 catalogue and LAADS product page; GFED data page; SPEIbase database page; all four NOAA CPC / PSL ENSO links listed above; arXiv:2611.04536.
+
+The following official identifiers or paths could not be confirmed by automated HTTP success, so they are used only as citations or as "start from the parent page" guidance:
+
+- `https://doi.org/10.1029/2025WR042803` (Blougouras et al.): the DOI resolves to the Wiley / AGU page, which returned HTTP 403 to an automated request. The bibliographic DOI is retained.
+- `https://doi.org/10.5281/zenodo.7668423` (GFED5 burned area): the DOI is cited in the GFED5 ESSD paper, but the Zenodo landing page returned HTTP 403 to an automated request.
+- `https://spei.csic.es/spei_database_2_11`: listed on the official SPEIbase page as the v2.11 download location, but the request timed out. Use [https://spei.csic.es/database.html](https://spei.csic.es/database.html).
+- `https://blogs.exeter.ac.uk/trendy/` was checked as a possible TRENDY project page and returned HTTP 404. It is not used as an access link.
+
+## Suggested citation starters
+
+Always cite the dataset versions you actually download, and follow each provider's requested citation. The two papers that motivate the emulator and aS_rz design are:
+
+Ke, P., Gui, X., Sitch, S., Liu, Z., Li, X., Bian, J., Friedlingstein, P., and Ciais, P. (2026). Machine learning emulators of dynamic global vegetation models for fast gridded carbon budget predictions. arXiv:2611.04536. https://doi.org/10.48550/arXiv.2611.04536
+
+Blougouras, G., Jiang, S., Brenning, A., Migliavacca, M., Slater, L., Zhou, J., Kumar, R., Tian, L., Wang, C., and Reichstein, M. (2026). Spatiotemporal dynamics of active root zone storage revealed from hybrid machine learning. *Water Resources Research*, 62, e2025WR042803. https://doi.org/10.1029/2025WR042803
