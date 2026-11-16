@@ -1,10 +1,88 @@
-# Example configuration for hybrid emulator
-model:
-  patch_size: 18
-  latent_asrz: true
-training:
-  years: [2000, 2021]
-  extreme_weight: 2.0
+# Example configuration for the extreme-aware hybrid DGVM emulator.
+# Paths and hyperparameters are placeholders for an early-stage project.
+# They are not fitted values or reported results.
+
+project:
+  name: extreme-aware-hybrid-dgvm-emulators
+  seed: 42
+
 data:
-  use_fwi: true
-  use_burned_area: true
+  # Local data root; this directory is gitignored.
+  root: data/
+  trendy:
+    experiment: S2   # S2 or S3; see docs/data_sources.md
+    variable: nbp
+    path: data/trendy/nbp/
+  era5:
+    path: data/era5/
+    variables:
+      - t2m    # 2 m temperature
+      - d2m    # 2 m dewpoint (for VPD)
+      - tp     # total precipitation
+      - ssrd   # surface solar radiation downwards
+      - strd   # surface thermal radiation downwards
+      - u10
+      - v10
+  fwi:
+    path: data/fwi/
+    variable: fwi
+  burned_area:
+    source: gfed5    # mcd64a1 or gfed5 / gfed5_nrt
+    path: data/burned_area/
+  drought:
+    vpd: derived_from_era5
+    spei_path: data/spei/
+    spei_timescale_months: 3
+  enso:
+    index: ONI       # ONI or nino34
+    path: data/enso/
+
+period:
+  start: "2000-01"
+  end: "2024-12"
+  # Suggested split. The test years follow the proposal (held-out 2022-2024).
+  # Train and validation bounds may change with the TRENDY release in use.
+  train_years: [2000, 2018]
+  val_years: [2019, 2021]
+  test_years: [2022, 2024]
+
+model:
+  architecture: hybrid_cnn
+  in_channels: null          # set from the assembled input stack
+  hidden_channels: [32, 64, 64, 32]
+  kernel_size: 3
+  latent_asrz: true
+  mass_balance_constraint: true
+  # Output heads: monthly NBP and latent aS_rz
+
+loss:
+  nbp: mse
+  # Up-weight large negative NBP anomalies (drought, heat and fire-related drawdowns).
+  extreme_weighting: true
+  negative_anomaly_threshold_sigma: -1.5   # placeholder
+  extreme_weight: 3.0                      # placeholder
+  mass_balance_weight: 0.1                 # placeholder
+  asrz_regularization: 0.01                # placeholder
+
+training:
+  batch_size: 8
+  learning_rate: 1.0e-4
+  max_epochs: 100
+  # Progressive autoregressive training for multi-year stability.
+  # Start with short, teacher-forced windows and lengthen the recursive rollout.
+  autoregressive:
+    enabled: true
+    initial_rollout_months: 1
+    final_rollout_months: 24
+    schedule: linear
+    teacher_forcing_start: 1.0
+    teacher_forcing_end: 0.0
+
+evaluation:
+  held_out_years: [2022, 2023, 2024]
+  metrics:
+    - r2
+    - rmse
+    - anomaly_r2
+  # Specific droughts, heatwaves and fires will be listed here later.
+  event_case_studies: []

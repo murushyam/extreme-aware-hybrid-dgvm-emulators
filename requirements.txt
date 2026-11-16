@@ -1,8 +1,17 @@
+# Core scientific stack. Versions are left unpinned in this early-stage scaffold.
+# For GPU training, install a CUDA build of torch from https://pytorch.org
+# before (or instead of) the unpinned torch line below.
 torch
 numpy
 xarray
+netCDF4
+dask
 pandas
 scipy
+scikit-learn
 matplotlib
-netcdf4
+cartopy
 pyyaml
+tqdm
+zarr
+jupyter
